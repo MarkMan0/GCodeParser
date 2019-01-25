@@ -34,11 +34,11 @@ int main(int argc, char *argv[])
 	GcodeParser parser(filename);
 
 	//parser.heatBedAndExt();
-	//parser.layersToLcd();
-	parser.optimizeAcceleration();
-	parser.writeToFile(outName);
+	parser.layersAndTimeToLcd();
+	//parser.optimizeAcceleration();
+	//parser.writeToFile(outName);
 
-
+	
 }
 
 

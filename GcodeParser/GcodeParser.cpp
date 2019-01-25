@@ -74,32 +74,58 @@ void GcodeParser::layersAndTimeToLcd()
 
 	searching = true;
 
-	while (line != lines->end()) {
+	while (searching && line != lines->end()) {
 		//search for time
 		if (beginsWith(*line, ";TIME:")) {
 			this->printTime = stol((*line).substr(strlen(";TIME:")));
 
 			searching = false;
 		}
+		++line;
 
 	}
 
+	int currLayer = 0;
+	int currTime = 0;
 
 
 	for (auto it = lines->begin(); it != lines->end(); ++it ) {
 
 		string line = *it;
+
 		
+
+		if (beginsWith(line, ";TIME_ELAPSED:")) {
+			auto first = line.find(":");
+			auto last = line.find(".");
+
+			currTime = stoi(line.substr(first + 1, last - first-1));
+
+		}
+
+
 		if (line.find(";LAYER:") != string::npos) {
 
 			string layerNo = line.substr(strlen(";LAYER:"));		//extract the number
 			long currLayer = stol(layerNo);
 
-			string plusLine = "M117 Layer " + to_string(currLayer + 1);		//zero index to 1 index
+			string plusLine = "M117 " + to_string(currLayer + 1);		//zero index to 1 index
 			plusLine += "/" + to_string(this->layerCount);				//M117  Updates the LCD
 
+			int timeLeft = this->printTime - currTime;
+
+			int hours = timeLeft / 3600;
+			int minutes = (timeLeft - hours * 3600) / 60;
+
+			plusLine += " ";
+
+			if (hours > 0)
+				plusLine += to_string(hours) + "h";
+
+			plusLine += to_string(minutes) + "m";
+
 			//Message will be something like:
-			//Layer 50/100
+			//Layer 50/100 1h25m
 			
 			//insert the new line
 			lines->insert(it, plusLine);
