@@ -46,7 +46,7 @@ void GcodeParser::layersToLcd()
 			//found it
 			//first now points to the first number after the colon
 
-			this->layerCount = stol(line.substr(strlen(";LAYER:")));
+			this->layerCount = stol(line.substr(strlen(";LAYER:"))) + 1;		//+1, because 0-indexed
 			searching = false;
 		}
 		++currLine;
@@ -260,6 +260,8 @@ void GcodeParser::optimizeAcceleration()
 	}
 	
 }
+
+
 
 
 
