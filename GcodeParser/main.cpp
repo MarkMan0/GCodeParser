@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 	//parser.heatBedAndExt();
 	parser.layersAndTimeToLcd();
 	//parser.optimizeAcceleration();
-	//parser.writeToFile(outName);
+	parser.writeToFile(outName);
 
 	
 }
