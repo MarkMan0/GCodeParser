@@ -5,6 +5,24 @@
 #include <ios>
 #include <string>
 
+bool beginsWith(const std::string &src, const std::string &phrase) {
+	return (src.find(phrase) != std::string::npos);
+}
+
+
+void splitString(const std::string& src, const std::string& delim, std::vector<std::string>& cont) {
+	std::string::size_type curr, prev = 0;
+
+	curr = src.find_first_of(delim);
+	while (curr != std::string::npos) {
+		cont.push_back(src.substr(prev, curr - prev));
+		prev = curr + 1;
+		curr = src.find_first_of(delim, prev);
+	}
+	cont.push_back(src.substr(prev, curr - prev));
+}
+
+
 
 GcodeParser::GcodeParser(std::string filename) {
 
@@ -29,7 +47,7 @@ GcodeParser::GcodeParser(std::string filename) {
 	inFile.close();
 }
 
-void GcodeParser::layersToLcd()
+void GcodeParser::layersAndTimeToLcd()
 {
 	using namespace std;
 	//find the number of the layers
@@ -42,7 +60,7 @@ void GcodeParser::layersToLcd()
 	{
 		string line = *currLine;
 
-		if (line.find(";LAYER:") != string::npos) {
+		if (beginsWith(line, ";LAYER")) {
 			//found it
 			//first now points to the first number after the colon
 
@@ -50,6 +68,20 @@ void GcodeParser::layersToLcd()
 			searching = false;
 		}
 		++currLine;
+	}
+
+	auto line = lines->begin();
+
+	searching = true;
+
+	while (line != lines->end()) {
+		//search for time
+		if (beginsWith(*line, ";TIME:")) {
+			this->printTime = stol((*line).substr(strlen(";TIME:")));
+
+			searching = false;
+		}
+
 	}
 
 
@@ -151,23 +183,6 @@ void GcodeParser::heatBedAndExt() {
 
 }
 
-bool beginsWith(const std::string &src, const std::string &phrase) {
-	return (src.find(phrase) != std::string::npos);
-}
-
-
-void splitString(const std::string& src, const std::string& delim, std::vector<std::string>& cont) {
-	std::string::size_type curr, prev = 0;
-
-	curr = src.find_first_of(delim);
-	while (curr != std::string::npos) {
-		cont.push_back(src.substr(prev, curr - prev));
-		prev = curr + 1;
-		curr = src.find_first_of(delim, prev);
-	}
-	cont.push_back(src.substr(prev, curr - prev));
-}
-
 
 
 
@@ -260,8 +275,6 @@ void GcodeParser::optimizeAcceleration()
 	}
 	
 }
-
-
 
 
 
