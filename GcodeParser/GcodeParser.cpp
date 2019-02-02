@@ -310,6 +310,10 @@ void GcodeParser::optimizeAcceleration()
 	
 }
 
+void GcodeParser::extruderSpeedControl()
+{
+}
+
 
 
 

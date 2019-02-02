@@ -19,6 +19,8 @@ public:
 	void heatBedAndExt();
 	void optimizeAcceleration();
 
+	void extruderSpeedControl();
+
 
 	void writeToFile(std::string filename) const;
 
