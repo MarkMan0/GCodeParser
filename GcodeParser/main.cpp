@@ -35,10 +35,10 @@ int main(int argc, char *argv[])
 
 	parser.extruderSpeedControl();
 
-	//parser.heatBedAndExt();
-	//parser.layersAndTimeToLcd();
-	//parser.optimizeAcceleration();
-	//parser.writeToFile(outName);
+	parser.heatBedAndExt();
+	parser.layersAndTimeToLcd();
+	parser.optimizeAcceleration();
+	parser.writeToFile(outName);
 
 	
 }
