@@ -5,6 +5,24 @@
 #include <ios>
 #include <string>
 
+bool beginsWith(const std::string &src, const std::string &phrase) {
+	return (src.find(phrase) != std::string::npos);
+}
+
+
+void splitString(const std::string& src, const std::string& delim, std::vector<std::string>& cont) {
+	std::string::size_type curr, prev = 0;
+
+	curr = src.find_first_of(delim);
+	while (curr != std::string::npos) {
+		cont.push_back(src.substr(prev, curr - prev));
+		prev = curr + 1;
+		curr = src.find_first_of(delim, prev);
+	}
+	cont.push_back(src.substr(prev, curr - prev));
+}
+
+
 
 GcodeParser::GcodeParser(std::string filename) {
 
@@ -29,7 +47,7 @@ GcodeParser::GcodeParser(std::string filename) {
 	inFile.close();
 }
 
-void GcodeParser::layersToLcd()
+void GcodeParser::layersAndTimeToLcd()
 {
 	using namespace std;
 	//find the number of the layers
@@ -42,32 +60,84 @@ void GcodeParser::layersToLcd()
 	{
 		string line = *currLine;
 
-		if (line.find(";LAYER:") != string::npos) {
+		if (beginsWith(line, ";LAYER")) {
 			//found it
 			//first now points to the first number after the colon
 
-			this->layerCount = stol(line.substr(strlen(";LAYER:")));
+			this->layerCount = stol(line.substr(strlen(";LAYER:"))) + 1;		//+1, because 0-indexed
 			searching = false;
 		}
 		++currLine;
 	}
 
+	auto line = lines->begin();
+
+	searching = true;
+
+	while (searching && line != lines->end()) {
+		//search for time
+		if (beginsWith(*line, ";TIME:")) {
+			this->printTime = stol((*line).substr(strlen(";TIME:")));
+
+			searching = false;
+		}
+		++line;
+
+	}
+
+	int currLayer = 0;
+	int currTime = 0;
 
 
 	for (auto it = lines->begin(); it != lines->end(); ++it ) {
 
 		string line = *it;
+
 		
+
+		if (beginsWith(line, ";TIME_ELAPSED:")) {
+			auto first = line.find(":");
+			auto last = line.find(".");
+
+			currTime = stoi(line.substr(first + 1, last - first-1));
+
+		}
+
+
 		if (line.find(";LAYER:") != string::npos) {
 
 			string layerNo = line.substr(strlen(";LAYER:"));		//extract the number
 			long currLayer = stol(layerNo);
 
-			string plusLine = "M117 Layer " + to_string(currLayer + 1);		//zero index to 1 index
+			string plusLine = "M117 " + to_string(currLayer + 1);		//zero index to 1 index
 			plusLine += "/" + to_string(this->layerCount);				//M117  Updates the LCD
 
+			int timeLeft = this->printTime - currTime;
+
+			int hours = timeLeft / 3600;
+			int minutes = (timeLeft - hours * 3600) / 60;
+
+			plusLine += " ";
+
+			if (hours > 0)
+				plusLine += to_string(hours) + "h";
+
+			plusLine += to_string(minutes) + "m";
+
+			plusLine += "/";
+	
+			hours = this->printTime / 3600;
+
+			if (hours > 0)
+				plusLine += to_string(hours) + "h";
+
+			minutes = this->printTime / 60;
+
+
+			plusLine += to_string(minutes) + "m";
+
 			//Message will be something like:
-			//Layer 50/100
+			//50/100 1h25m
 			
 			//insert the new line
 			lines->insert(it, plusLine);
@@ -150,27 +220,6 @@ void GcodeParser::heatBedAndExt() {
 	lines->erase(eraseStart, eraseEnd);
 
 }
-
-bool beginsWith(const std::string &src, const std::string &phrase) {
-	return (src.find(phrase) != std::string::npos);
-}
-
-
-void splitString(const std::string& src, const std::string& delim, std::vector<std::string>& cont) {
-	std::string::size_type curr, prev = 0;
-
-	curr = src.find_first_of(delim);
-	while (curr != std::string::npos) {
-		cont.push_back(src.substr(prev, curr - prev));
-		prev = curr + 1;
-		curr = src.find_first_of(delim, prev);
-	}
-	cont.push_back(src.substr(prev, curr - prev));
-}
-
-
-
-
 
 void GcodeParser::optimizeAcceleration()
 {
@@ -260,6 +309,42 @@ void GcodeParser::optimizeAcceleration()
 	}
 	
 }
+
+void GcodeParser::extruderSpeedControl()
+{
+
+	using namespace std;
+
+	//get retraction speed setting
+	int retSpeed = 0;
+	auto it = lines->rbegin();
+
+	while (it != lines->rend())
+	{
+
+		if (beginsWith(*it, ";SETTING")) {
+			size_t pos = it->find("retraction_speed");
+			if ( pos != string::npos) {
+
+				pos += strlen("retraction_speed = ");
+
+				size_t pos2 = it->find("\\", pos);
+
+				string speed = it->substr(pos, pos2 - pos);
+
+				retSpeed = stoi(speed);
+				break;
+			}
+
+		}
+		++it;
+	}
+
+	cout << retSpeed;
+
+}
+
+
 
 
 
