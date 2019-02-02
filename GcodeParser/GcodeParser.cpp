@@ -312,6 +312,36 @@ void GcodeParser::optimizeAcceleration()
 
 void GcodeParser::extruderSpeedControl()
 {
+
+	using namespace std;
+
+	//get retraction speed setting
+	int retSpeed = 0;
+	auto it = lines->rbegin();
+
+	while (it != lines->rend())
+	{
+
+		if (beginsWith(*it, ";SETTING")) {
+			size_t pos = it->find("retraction_speed");
+			if ( pos != string::npos) {
+
+				pos += strlen("retraction_speed = ");
+
+				size_t pos2 = it->find("\\", pos);
+
+				string speed = it->substr(pos, pos2 - pos);
+
+				retSpeed = stoi(speed);
+				break;
+			}
+
+		}
+		++it;
+	}
+
+	cout << retSpeed;
+
 }
 
 
