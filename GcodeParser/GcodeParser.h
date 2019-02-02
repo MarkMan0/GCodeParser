@@ -19,6 +19,7 @@ public:
 	void heatBedAndExt();
 	void optimizeAcceleration();
 
+
 	void writeToFile(std::string filename) const;
 
 

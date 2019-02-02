@@ -33,9 +33,9 @@ int main(int argc, char *argv[])
 
 	GcodeParser parser(filename);
 
-	//parser.heatBedAndExt();
+	parser.heatBedAndExt();
 	parser.layersAndTimeToLcd();
-	//parser.optimizeAcceleration();
+	parser.optimizeAcceleration();
 	parser.writeToFile(outName);
 
 	

@@ -124,8 +124,20 @@ void GcodeParser::layersAndTimeToLcd()
 
 			plusLine += to_string(minutes) + "m";
 
+			plusLine += "/";
+	
+			hours = this->printTime / 3600;
+
+			if (hours > 0)
+				plusLine += to_string(hours) + "h";
+
+			minutes = this->printTime / 60;
+
+
+			plusLine += to_string(minutes) + "m";
+
 			//Message will be something like:
-			//Layer 50/100 1h25m
+			//50/100 1h25m
 			
 			//insert the new line
 			lines->insert(it, plusLine);
@@ -208,10 +220,6 @@ void GcodeParser::heatBedAndExt() {
 	lines->erase(eraseStart, eraseEnd);
 
 }
-
-
-
-
 
 void GcodeParser::optimizeAcceleration()
 {
@@ -301,6 +309,8 @@ void GcodeParser::optimizeAcceleration()
 	}
 	
 }
+
+
 
 
 
