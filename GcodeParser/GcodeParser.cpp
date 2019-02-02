@@ -127,17 +127,26 @@ void GcodeParser::layersAndTimeToLcd()
 			plusLine += "/";
 	
 			hours = this->printTime / 3600;
+			minutes = (this->printTime - hours*3600) / 60;
 
 			if (hours > 0)
 				plusLine += to_string(hours) + "h";
 
-			minutes = this->printTime / 60;
+			plusLine += to_string(minutes) + "m";
 
+
+			hours = currTime / 3600;
+			minutes = (currTime - hours * 3600) / 60;
+
+			plusLine += " ";
+
+			if (hours > 0)
+				plusLine += to_string(hours) + "h";
 
 			plusLine += to_string(minutes) + "m";
 
 			//Message will be something like:
-			//50/100 1h25m
+			//50/100 1h25m/2h20m 55m
 			
 			//insert the new line
 			lines->insert(it, plusLine);
