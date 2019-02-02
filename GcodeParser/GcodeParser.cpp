@@ -340,6 +340,27 @@ void GcodeParser::extruderSpeedControl()
 		++it;
 	}
 
+	string printExtSpeed = "M203 E3";
+
+	string retractionExtSpeed = "M203 E" + to_string(retSpeed * 60);
+
+	lines->insert(lines->begin(), printExtSpeed);
+
+
+	for (auto it = lines->begin(); it != lines->end(); ++it) {
+
+		//retraction command looks like this
+		//G1 Fxxxx E-y
+
+		if (beginsWith(*it, "G1 F" + to_string(retSpeed * 60) + " E")) {
+			//this line is retraction, change M203
+			lines->insert(it, retractionExtSpeed);
+			lines->insert(next(it), printExtSpeed);
+		}
+
+	}
+
+
 	cout << retSpeed;
 
 }
