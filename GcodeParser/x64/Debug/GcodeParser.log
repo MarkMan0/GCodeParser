@@ -1,2 +1,5 @@
-﻿  main.cpp
-  GcodeParser.vcxproj -> C:\Users\Mark\source\repos\GCodeParser\x64\Debug\GcodeParser.exe
+﻿  GcodeParser.cpp
+  main.cpp
+  Generating Code...
+  LINK : C:\Users\Mark\source\repos\GcodeParser\x64\Debug\GcodeParser.exe not found or not built by the last incremental link; performing full link
+  GcodeParser.vcxproj -> C:\Users\Mark\source\repos\GcodeParser\x64\Debug\GcodeParser.exe
